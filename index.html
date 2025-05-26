@@ -940,17 +940,25 @@ function displayMessage(message, sender) {
   chatbox.scrollTop = chatbox.scrollHeight;
 }
 
-function getBotResponse(message) {
-  const lowerMessage = message.toLowerCase();
-  for (const data of chatbotData) {
-    for (const keyword of data.keywords) {
-      if (lowerMessage.includes(keyword.toLowerCase())) {
-        return data.response;
-      }
+function normalize(text) {
+      return text
+        .toLowerCase()
+        .split(/\s+/)
+        .map(word => word.endsWith('s') && word.length > 3 ? word.slice(0, -1) : word)
+        .join(' ');
     }
-  }
-  return "I'm not sure how to respond to that. Can you rephrase ?";
-}
+
+    function getBotResponse(message) {
+      const normalizedMsg = normalize(message);
+      for (const data of chatbotData) {
+        for (const keyword of data.keywords) {
+          if (normalizedMsg.includes(normalize(keyword))) {
+            return data.response;
+          }
+        }
+      }
+      return "I'm not sure how to respond to that. Can you rephrase ?";
+    }
 
 function clearChat() {
   document.getElementById("chatbox").innerHTML = "";
