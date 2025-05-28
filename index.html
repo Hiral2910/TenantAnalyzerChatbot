@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Keyword-Based Chatbot</title>
@@ -11,25 +13,38 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 2rem;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
     }
 
     h2 {
       color: #2F4F6F;
+      margin-top: 1rem;
     }
 
     #chatbox {
       width: 100%;
-      max-width: 500px;
-      height: 400px;
+      max-width: 700px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       border: 1px solid #2F4F6F;
       background: rgba(255, 255, 255, 0.49);
-      overflow-y: auto;
-      padding: 1rem;
-      margin-bottom: 1rem;
+      margin: 1rem;
       border-radius: 8px;
       box-shadow: 0 4px 8px #2F4F6F;
+      overflow: hidden;
     }
+.chat-messages {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  max-height: 70vh; /* Limit height for scrolling */
+  display: flex;
+  flex-direction: column;
+}
 
     .message {
       margin: 0.5rem 0;
@@ -38,22 +53,25 @@
     }
 
     .user {
-      background-color: #1E3A8A;
+      background-color: #2F4F6F;
       color: #ffffff;
       align-self: flex-end;
     }
 
     .bot {
-      background-color: #2563EB;
+      background-color: #36A3AE;
       color: #ffffff;
       align-self: flex-start;
     }
 
     #userInput {
       display: flex;
-      width: 100%;
-      max-width: 500px;
       gap: 0.5rem;
+      padding: 0.75rem;
+      border-top: 1px solid #ccc;
+      background-color: #f9f9f9;
+       width: 100%;
+      max-width: 650px;
     }
 
     #input {
@@ -68,30 +86,34 @@
     }
 
     button {
-      padding: 0.5rem 1rem;
+      padding: 0.5rem;
       font-size: 1rem;
-      border: 1px solid #2F4F6F;
-      border-radius: 8px;
-      background-color: #3B82F6;
-      color: white;
+      border: none;
+      background-color: transparent;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: transform 0.2s ease;
     }
 
     button:hover {
-      background-color: #2563EB;
+      transform: scale(1.1);
+    }
+
+    button svg {
+      width: 24px;
+      height: 24px;
+      fill: #2F4F6F;
     }
   </style>
 </head>
 <body>
 
   <h2>Tenant Analyzer Chatbot</h2>
-  <div id="chatbox"></div>
+  <div id="chatbox"> <div class="chat-messages" id="chatMessages"></div></div>
 
   <div id="userInput">
     <input type="text" id="input" placeholder="Ask something...">
-    <button onclick="sendMessage()">Send</button>
-    <button onclick="clearChat()">Clear</button>
+    <button onclick="sendMessage()" title="Send"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg></button>
+    <button onclick="clearChat()" title="Clear Chat"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6l3 18h12l3-18H3zm18-3h-5.5l-1-1h-5l-1 1H3v2h18V3z"/></svg></button>
   </div>
 
   <script>
@@ -917,30 +939,29 @@
     ];
 
 
+function sendMessage() {
+      const inputField = document.getElementById("input");
+      const userMessage = inputField.value.trim();
+      if (!userMessage) return;
 
-    function sendMessage() {
-  const inputField = document.getElementById("input");
-  const userMessage = inputField.value.trim();
-  if (!userMessage) return;
+      displayMessage(userMessage, "user");
 
-  displayMessage(userMessage, "user");
+      const botResponse = getBotResponse(userMessage);
+      displayMessage(botResponse, "bot");
 
-  const botResponse = getBotResponse(userMessage);
-  displayMessage(botResponse, "bot");
+      inputField.value = "";
+    }
 
-  inputField.value = "";
-}
+    function displayMessage(message, sender) {
+      const chatbox = document.getElementById("chatbox");
+      const messageElem = document.createElement("div");
+      messageElem.className = `message ${sender}`;
+      messageElem.textContent = `${sender === "user" ? "You" : "Bot"}: ${message}`;
+      chatMessages.appendChild(messageElem);
+  chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to bottom
+    }
 
-function displayMessage(message, sender) {
-  const chatbox = document.getElementById("chatbox");
-  const messageElem = document.createElement("div");
-  messageElem.className = `message ${sender}`;
-  messageElem.textContent = `${sender === "user" ? "You" : "Bot"}: ${message}`;
-  chatbox.appendChild(messageElem);
-  chatbox.scrollTop = chatbox.scrollHeight;
-}
-
-function normalize(text) {
+    function normalize(text) {
       return text
         .toLowerCase()
         .split(/\s+/)
@@ -957,21 +978,20 @@ function normalize(text) {
           }
         }
       }
-      return "I'm not sure how to respond to that. Can you rephrase ?";
+      return "I'm not sure how to respond to that. Can you rephrase?";
     }
 
-function clearChat() {
-  document.getElementById("chatbox").innerHTML = "";
-  document.getElementById("input").value = "";
-}
+    function clearChat() {
+      document.getElementById("chatbox").innerHTML = "";
+      document.getElementById("input").value = "";
+    }
 
-
-document.getElementById("input").addEventListener("keydown", function (event) {
-  if (event.key === "Enter") {
-    event.preventDefault(); 
-    sendMessage();
-  }
-  });
+    document.getElementById("input").addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        sendMessage();
+      }
+    });
 
   </script>
 </body>
